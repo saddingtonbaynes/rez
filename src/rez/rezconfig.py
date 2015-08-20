@@ -39,17 +39,16 @@ import os
 # The package search path. Rez uses this to find packages. A package with the
 # same name and version in an earlier path takes precedence.
 packages_path = [
-    "~/packages",           # locally installed pkgs, not yet deployed
-    "~/.rez/packages/int",  # internally developed pkgs, deployed
-    "~/.rez/packages/ext",  # external (3rd party) pkgs, such as houdini, boost
+    "P:/packages",
+    "C:/env_manager/packages"
 ]
 
 # The path that Rez will locally install packages to when rez-build is used
-local_packages_path = "~/packages"
+local_packages_path = "P:/packages"
 
 # The path that Rez will deploy packages to when rez-release is used. For
 # production use, you will probably want to change this to a site-wide location.
-release_packages_path = "~/.rez/packages/int"
+release_packages_path = "C:/env_manager/packages"
 
 # Where temporary files go. Defaults to appropriate path depending on your
 # system - for example, *nix distributions will probably set this to "/tmp". It
