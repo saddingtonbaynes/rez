@@ -127,6 +127,8 @@ def get_plugins(package_name, paths=None):
             continue  # not a plugin of itself
 
         plugin_pkg = get_latest_package(package_name_, paths=paths)
+        if not plugin_pkg:
+            continue
         if not plugin_pkg.plugin_for:
             continue
         for plugin_for in plugin_pkg.plugin_for:
