@@ -22,7 +22,7 @@ def setup_parser_common(parser):
     elif clss:
         types = [x.name() for x in clss]
         parser.add_argument(
-            "-b", "--build-system", dest="buildsys", type=str, choices=types,
+            "-b", "--build-system", dest="buildsys", type=str, choices=types, default=None,
             help="the build system to use.")
 
     parser.add_argument(

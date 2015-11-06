@@ -75,7 +75,7 @@ macro (rez_install_context)
 	#
 
 	string(REPLACE ";" " ; " INSTCTXT_EXTRA_COMMANDS2 "${INSTCTXT_EXTRA_COMMANDS}")
-	string(TOUPPER ${REZ_BUILD_PROJECT_NAME} uproj)
+	string(TOUPPER "${REZ_BUILD_PROJECT_NAME}" uproj)
 
 	list_to_string(INSTCTXT_PACKAGES2 INSTCTXT_PACKAGES)
 

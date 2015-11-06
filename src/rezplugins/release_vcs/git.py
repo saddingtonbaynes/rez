@@ -1,10 +1,11 @@
 """
 Git version control
 """
+import sys
+
 from rez.release_vcs import ReleaseVCS
 from rez.utils.logging_ import print_error, print_warning, print_debug
 from rez.exceptions import ReleaseVCSError
-from rez.vendor.sh.sh import git
 from shutil import rmtree
 import functools
 import os.path
@@ -221,9 +222,10 @@ class GitReleaseVCS(ReleaseVCS):
         gitdir = os.path.join(path, ".git")
 
         os.chdir(path_)
-        git.clone(url, dirname)
+        raise NotImplementedError('Need to change the calls to sh.git to self.git')
+        # git.clone(url, dirname)
         os.chdir(path)
-        git.checkout(commit)
+        # git.checkout(commit)
         rmtree(gitdir)
 
 

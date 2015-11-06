@@ -37,11 +37,15 @@ class CMakeBuildSystem(BuildSystem):
       if 0, just a build is occurring.
     """
 
-    build_systems = {'eclipse':     "Eclipse CDT4 - Unix Makefiles",
-                     'codeblocks':  "CodeBlocks - Unix Makefiles",
-                     'make':        "Unix Makefiles",
-                     'nmake':       "NMake Makefiles",
-                     'xcode':       "Xcode"}
+    build_systems = {
+        'eclipse':     "Eclipse CDT4 - Unix Makefiles",
+        'codeblocks':  "CodeBlocks - Unix Makefiles",
+        'make':        "Unix Makefiles",
+        'nmake':       "NMake Makefiles",
+        'xcode':       "Xcode",
+        'vs2012':      "Visual Studio 11",
+        'vs2015':      "Visual Studio 14 2015 Win64"
+    }
 
     build_targets = ["Debug", "Release", "RelWithDebInfo"]
 
@@ -172,21 +176,34 @@ class CMakeBuildSystem(BuildSystem):
             cmd = [self.settings.make_binary]
         else:
             cmd = ["make"]
+
+        # TODO: this should be better
+        ms_build = False
+        if sys.platform == 'win32' and 'MSBuild' in self.settings.make_binary:
+            ms_build = True
+            cmd += ['ALL_BUILD.vcxproj']  # '/v:diag',
+
+        # cmd = [found_exe, "-B"+build_path]
         cmd += (self.child_build_args or [])
 
-        if not any(x.startswith("-j") for x in (self.child_build_args or [])):
-            n = variant.config.build_thread_count
-            cmd.append("-j%d" % n)
+        # if not any(x.startswith("-j") for x in (self.child_build_args or [])):
+        #     n = variant.config.build_thread_count or cpu_count()
+        #     cmd.append("-j%d" % n)
 
         # execute make within the build env
         _pr("\nExecuting: %s" % ' '.join(cmd))
+
         retcode, _, _ = context.execute_shell(command=cmd,
                                               block=True,
                                               cwd=build_path,
                                               actions_callback=callback)
 
         if not retcode and install and "install" not in cmd:
-            cmd.append("install")
+            if ms_build:
+                cmd.remove('ALL_BUILD.vcxproj')
+                cmd += ['install.vcxproj']
+            else:
+                cmd.append("install")
 
             # execute make install within the build env
             _pr("\nExecuting: %s" % ' '.join(cmd))
@@ -203,6 +220,10 @@ class CMakeBuildSystem(BuildSystem):
         settings = package.config.plugins.build_system.cmake
         cmake_path = os.path.join(os.path.dirname(__file__), "cmake_files")
         template_path = os.path.join(os.path.dirname(__file__), "template_files")
+
+        # TODO: ask where the best place to put this code is
+        if sys.platform == 'win32':
+            cmake_path = cmake_path.replace('\\', '/')
 
         executor.env.CMAKE_MODULE_PATH.append(cmake_path)
         executor.env.REZ_BUILD_DOXYFILE = os.path.join(template_path, 'Doxyfile')

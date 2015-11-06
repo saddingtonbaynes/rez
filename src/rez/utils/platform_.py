@@ -505,6 +505,10 @@ class WindowsPlatform(Platform):
     def _physical_cores(self):
         return self._physical_cores_from_wmic()
 
+    def _difftool(self):
+        from rez.util import which
+        return which("kdiff3", "meld", "diff")
+
 
 # singleton
 platform_ = None
