@@ -16,6 +16,7 @@ package_request_schema = Or(basestring,
 
 package_schema = Schema({
     Required("name"):                   basestring,
+    Optional("nice_name"):              basestring,
     Optional("base"):                   basestring,
     Optional("version"):                Or(basestring,
                                            And(Version, Use(str))),

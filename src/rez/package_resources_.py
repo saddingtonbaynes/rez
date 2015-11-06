@@ -38,7 +38,8 @@ help_schema = Or(basestring,  # single help entry
 
 # requirements of all package-related resources
 base_resource_schema_dict = {
-    Required("name"):                   basestring
+    Required("name"):                   basestring,
+    Optional("nice_name"):              basestring
 }
 
 
