@@ -29,5 +29,6 @@ cmake = {
 }
 
 if os.name != "posix":
-    cmake["build_system"] = "nmake"
-    cmake["make_binary"] = "nmake"
+    cmake["build_system"] = "vs2015"
+    cmake["make_binary"] = r'C:\Windows\Microsoft.NET\Framework64\v4.0.30319\MSBuild.exe'
+    # cmake["make_binary"] = "nmake"
