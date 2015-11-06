@@ -28,6 +28,10 @@ package_schema = Schema({
     Optional('private_build_requires'): [package_request_schema],
     Optional('variants'):               [[package_request_schema]],
 
+    Optional('has_plugins'):            bool,
+    Optional('plugin_for'):             [basestring],
+    Optional('plugin_launch_commands'):  _commands_schema,
+
     Optional('uuid'):                   basestring,
     Optional('config'):                 dict,
     Optional('tools'):                  [basestring],

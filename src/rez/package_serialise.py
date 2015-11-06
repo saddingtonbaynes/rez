@@ -37,7 +37,11 @@ package_key_order = [
     'vcs',
     'revision',
     'previous_version',
-    'previous_revision']
+    'previous_revision',
+    'has_plugins',
+    'plugin_for',
+    'plugin_launch_commands'
+]
 
 
 version_schema = Or(basestring, And(Version, Use(str)))
@@ -62,6 +66,10 @@ package_serialise_schema = Schema({
     Optional('build_requires'):         [package_request_schema],
     Optional('private_build_requires'): [package_request_schema],
     Optional('variants'):               [[package_request_schema]],
+
+    Optional('has_plugins'):            bool,
+    Optional('plugin_for'):             [basestring],
+    Optional('plugin_launch_commands'):  source_code_schema,
 
     Optional('pre_commands'):           source_code_schema,
     Optional('commands'):               source_code_schema,
