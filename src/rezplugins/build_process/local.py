@@ -170,7 +170,7 @@ class LocalBuildProcess(BuildProcessHelper):
 
         # build and install variant
         build_result = self._build_variant_base(
-            build_type=BuildType.central,
+            build_type=BuildType.local,
             variant=variant,
             install_path=release_path,
             clean=True,
