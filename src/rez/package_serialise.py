@@ -14,6 +14,7 @@ from pprint import pformat
 # preferred order of keys in a package definition file
 package_key_order = [
     'name',
+    'nice_name',
     'version',
     'description',
     'authors',
@@ -51,6 +52,7 @@ source_code_schema = Or(SourceCode, And(basestring, Use(SourceCode)))
 # package serialisation schema
 package_serialise_schema = Schema({
     Required("name"):                   basestring,
+    Optional("nice_name"):              basestring,
     Optional("version"):                version_schema,
     Optional("description"):            basestring,
     Optional("authors"):                [basestring],
