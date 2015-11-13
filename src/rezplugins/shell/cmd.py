@@ -117,9 +117,9 @@ class CMD(Shell):
             if bind_rez:
                 ex.interpreter._bind_interactive_rez()
             if print_msg and not quiet:
-#                ex.info('')
-#                ex.info('You are now in a rez-configured environment.')
-#                ex.info('')
+                # ex.info('')
+                # ex.info('You are now in a rez-configured environment.')
+                # ex.info('')
                 if system.is_production_rez_install:
                     ex.command("cmd /Q /K rezolve context")
 
@@ -161,6 +161,7 @@ class CMD(Shell):
                 cmd = pre_command.strip().split()
             else:
                 cmd = pre_command
+
         cmd = cmd + [self.executable, "/Q", "/K", target_file]
         p = subprocess.Popen(cmd, env=env, **Popen_args)
         return p
