@@ -11,12 +11,10 @@ try:
 except ImportError:
      import xmlrpc.client as xmlrpclib
 
-from rez.bind._utils import check_version, find_exe, extract_version, make_dirs
+from rez.bind._utils import check_version, make_dirs
 from rez.package_maker__ import make_package
-from rez.system import system
 from rez.utils.platform_ import platform_
 from rez.vendor.version.version import Version
-import pprint
 import imp
 import setuptools
 import urllib2
@@ -25,13 +23,14 @@ import zipfile
 import shutil
 import re
 import subprocess
+import distutils.core
 
 
 SETUPTOOLS_ARGS = None
 
 
 def setup_parser(parser):
-    parser.add_argument("--pkg", type=str, metavar="PKG", required=True,
+    parser.add_argument("--pypkg", type=str, metavar="PYPKG", required=True,
                         help="The python package to bind")
     parser.add_argument("--version", type=str, required=False,
                         help="The version of the python package to bind")
@@ -43,9 +42,8 @@ def commands():
 
 
 def bind(path, version_range=None, opts=None, parser=None):
-
-    if opts and opts.pkg:
-        py_package_name = opts.pkg
+    if opts and opts.pypkg:
+        py_package_name = opts.pypkg
         package_name = py_package_name.replace('-', '_')
     else:
         raise ValueError('A package name needs to be specified')
@@ -145,10 +143,19 @@ def bind(path, version_range=None, opts=None, parser=None):
 
     # duck type the setup function so we can steal the arguments passed to it
     setuptools.setup = setup_dummy
+    distutils.core.setup = setup_dummy
+
     cwd = os.getcwd()
     os.chdir(package_dir)
     sys.path.extend([package_dir])
-    _ = imp.load_source('setup', setup_file)
+    old_args = sys.argv[:]
+    try:
+        _ = imp.load_source('{}_setup'.format(package_name), setup_file)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise e
+    sys.argv = old_args[:]
     os.chdir(cwd)
     sys.path.remove(package_dir)
 
@@ -158,14 +165,15 @@ def bind(path, version_range=None, opts=None, parser=None):
         :param req_str: requirement in the setuptools format
         :return: requirement in the rez format
         '''
+        req_str = req_str.replace('-', '_')
 
+        if not any((op in req_str for op in ['<', '>', '='])):
+            # even simpler "arrow" req
+            return req_str.strip()
         if '==' in req_str:
             # just a simple "arrow == 0.4.4" req
             req_pgk_name, req_version = req_str.split('==')
             return '{}-{}'.format(req_pgk_name.strip(), req_version.strip())
-        elif ',' not in req_str:
-            # even simpler "arrow" req
-            return req_str.strip()
 
         req_space_split = req_str.split(' ')
         req_pgk_name = req_space_split[0]
@@ -174,7 +182,7 @@ def bind(path, version_range=None, opts=None, parser=None):
 
         versions_rewrite = []
         for sub_requirement_str in requirements:
-            sub_requirement_match = re.match(r'([<>=]+?).?([0-9a-zA-Z\.]+)', sub_requirement_str)
+            sub_requirement_match = re.match(r'([<>=]+?) ?([0-9a-zA-Z\.]+)', sub_requirement_str)
             operation = sub_requirement_match.group(1).strip()
             req_version = sub_requirement_match.group(2).strip()
             if operation == '>=':
@@ -192,6 +200,7 @@ def bind(path, version_range=None, opts=None, parser=None):
             'pip', 'install',
             '--no-deps', '--ignore-installed',
             '--install-option="--install-purelib={}"'.format(pythonpath),
+            '--install-option="--install-platlib={}"'.format(pythonpath),
             '--install-option="--install-scripts={}"'.format(binpath),
             py_package_name
         ])
