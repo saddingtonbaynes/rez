@@ -196,9 +196,12 @@ def bind(path, version_range=None, opts=None, parser=None):
     def make_root(variant, root):
         binpath = make_dirs(root, "bin")
         pythonpath = make_dirs(root, "python")
+        headerpath = make_dirs(root, "include")
         install_cmd = ' '.join([
             'pip', 'install',
-            '--no-deps', '--ignore-installed',
+            '--no-deps', '--ignore-installed', '--verbose', '--verbose', '--verbose',
+            '--global-option="--verbose"',
+            '--install-option="--install-headers={}"'.format(headerpath),
             '--install-option="--install-purelib={}"'.format(pythonpath),
             '--install-option="--install-platlib={}"'.format(pythonpath),
             '--install-option="--install-scripts={}"'.format(binpath),
