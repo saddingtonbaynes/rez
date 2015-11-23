@@ -32,6 +32,8 @@ SETUPTOOLS_ARGS = None
 def setup_parser(parser):
     parser.add_argument("--pypkg", type=str, metavar="PYPKG", required=True,
                         help="The python package to bind")
+    parser.add_argument("--name", type=str, metavar="NAME", required=False, default=None,
+                        help="The name of the package to be created")
     parser.add_argument("--version", type=str, required=False,
                         help="The version of the python package to bind")
 
@@ -44,7 +46,10 @@ def commands():
 def bind(path, version_range=None, opts=None, parser=None):
     if opts and opts.pypkg:
         py_package_name = opts.pypkg
-        package_name = py_package_name.replace('-', '_')
+        if opts.name:
+            package_name = opts.name
+        else:
+            package_name = py_package_name.replace('-', '_')
     else:
         raise ValueError('A package name needs to be specified')
 
