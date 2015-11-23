@@ -10,6 +10,22 @@ from rez.util import shlex_join
 import os
 import re
 import subprocess
+import win32api
+import win32con
+
+
+def getenv_system(varname, default=''):
+    v = default
+    try:
+        rkey = win32api.RegOpenKey(win32con.HKEY_LOCAL_MACHINE, 'SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment')
+        try:
+            v = str(win32api.RegQueryValueEx(rkey, varname)[0])
+            v = win32api.ExpandEnvironmentStrings(v)
+        except:
+            pass
+    finally:
+        win32api.RegCloseKey(rkey)
+    return v
 
 
 class CMD(Shell):
@@ -62,32 +78,34 @@ class CMD(Shell):
     @classmethod
     def get_syspaths(cls):
         if not cls.syspaths:
-            paths = []
-
-            cmd = ["REG", "QUERY", "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment", "/v", "PATH"]
-            expected = "\r\nHKEY_LOCAL_MACHINE\\\\SYSTEM\\\\CurrentControlSet\\\\Control\\\\Session Manager\\\\Environment\r\n    PATH    REG_(EXPAND_)?SZ    (.*)\r\n\r\n"
-
-            p = subprocess.Popen(cmd, stdout=subprocess.PIPE,
-                                 stderr=subprocess.PIPE, shell=True)
-            out_, _ = p.communicate()
-
-            if p.returncode == 0:
-                match = re.match(expected, out_)
-                if match:
-                    paths.extend(match.group(2).split(os.pathsep))
-
-            cmd = ["REG", "QUERY", "HKCU\\Environment", "/v", "PATH"]
-            expected = "\r\nHKEY_CURRENT_USER\\\\Environment\r\n    PATH    REG_(EXPAND_)?SZ    (.*)\r\n\r\n"
-            p = subprocess.Popen(cmd, stdout=subprocess.PIPE,
-                                 stderr=subprocess.PIPE, shell=True)
-            out_, _ = p.communicate()
-
-            if p.returncode == 0:
-                match = re.match(expected, out_)
-                if match:
-                    paths.extend(match.group(2).split(os.pathsep))
-
-            cls.syspaths = set([x for x in paths if x])
+            # paths = []
+            #
+            # cmd = ["REG", "QUERY", "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment", "/v", "PATH"]
+            # expected = "\r\nHKEY_LOCAL_MACHINE\\\\SYSTEM\\\\CurrentControlSet\\\\Control\\\\Session Manager\\\\Environment\r\n    PATH    REG_(EXPAND_)?SZ    (.*)\r\n\r\n"
+            #
+            # p = subprocess.Popen(cmd, stdout=subprocess.PIPE,
+            #                      stderr=subprocess.PIPE, shell=True)
+            # out_, _ = p.communicate()
+            #
+            # if p.returncode == 0:
+            #     match = re.match(expected, out_)
+            #     if match:
+            #         paths.extend(match.group(2).split(os.pathsep))
+            #
+            # cmd = ["REG", "QUERY", "HKCU\\Environment", "/v", "PATH"]
+            # expected = "\r\nHKEY_CURRENT_USER\\\\Environment\r\n    PATH    REG_(EXPAND_)?SZ    (.*)\r\n\r\n"
+            # p = subprocess.Popen(cmd, stdout=subprocess.PIPE,
+            #                      stderr=subprocess.PIPE, shell=True)
+            # out_, _ = p.communicate()
+            #
+            # if p.returncode == 0:
+            #     match = re.match(expected, out_)
+            #     if match:
+            #         paths.extend(match.group(2).split(os.pathsep))
+            #
+            # cls.syspaths = set([x for x in paths if x])
+            #
+            cls.syspaths = set(getenv_system('PATH').split(os.pathsep) + os.getenv('PATH').split(os.pathsep))
         return cls.syspaths
 
     def _bind_interactive_rez(self):
