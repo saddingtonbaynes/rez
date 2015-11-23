@@ -35,6 +35,7 @@ package_schema = Schema({
     Optional('uuid'):                   basestring,
     Optional('config'):                 dict,
     Optional('tools'):                  [basestring],
+    Optional('tools_info'):             dict,
     Optional('help'):                   help_schema,
 
     Optional('pre_commands'):           _commands_schema,
