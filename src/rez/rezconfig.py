@@ -44,11 +44,11 @@ packages_path = [
 ]
 
 # The path that Rez will locally install packages to when rez-build is used
-local_packages_path = "P:/packages"
+local_packages_path = "C:/env_manager/packages"
 
 # The path that Rez will deploy packages to when rez-release is used. For
 # production use, you will probably want to change this to a site-wide location.
-release_packages_path = "C:/env_manager/packages"
+release_packages_path = "P:/packages"
 
 # Where temporary files go. Defaults to appropriate path depending on your
 # system - for example, *nix distributions will probably set this to "/tmp". It
