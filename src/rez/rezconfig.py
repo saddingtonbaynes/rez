@@ -40,6 +40,7 @@ import os
 # same name and version in an earlier path takes precedence.
 packages_path = [
     "P:/packages",
+    "//sbps01/deploy/packages",
     "C:/env_manager/packages"
 ]
 
@@ -285,7 +286,7 @@ warn_none = False
 debug_file_loads = False
 
 # Print debugging info when loading plugins
-debug_plugins = True
+debug_plugins = False
 
 # Print debugging info such as VCS commands during package release
 debug_package_release = False
