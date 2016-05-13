@@ -1087,6 +1087,85 @@ class ResolvedContext(object):
                                   **Popen_args)
 
     @_on_success
+    def execute_plugin_launch_commands(self):
+        interpreter = Python(target_environ=None)  # update current environ
+        executor = self._create_executor(interpreter, None)
+
+        resolved_pkgs = self.resolved_packages or []
+        error_class = Exception if config.catch_rex_errors else None
+
+        # set basic package variables and create per-package bindings
+        bindings = {}
+        for pkg in resolved_pkgs:
+            prefix = "REZ_" + pkg.name.upper().replace('.', '_')
+            executor.setenv(prefix + "_VERSION", str(pkg.version))
+            executor.setenv(prefix + "_BASE", pkg.base)
+            executor.setenv(prefix + "_ROOT", pkg.root)
+            bindings[pkg.name] = dict(version=VersionBinding(pkg.version),
+                                      variant=VariantBinding(pkg))
+
+            # just provide major/minor/patch during builds
+            if self.building:
+                if len(pkg.version) >= 1:
+                    executor.setenv(prefix + "_MAJOR_VERSION", str(pkg.version[0]))
+                if len(pkg.version) >= 2:
+                    executor.setenv(prefix + "_MINOR_VERSION", str(pkg.version[1]))
+                if len(pkg.version) >= 3:
+                    executor.setenv(prefix + "_PATCH_VERSION", str(pkg.version[2]))
+
+        executor.bind('request', RequirementsBinding(self._package_requests))
+        executor.bind('implicits', RequirementsBinding(self.implicit_packages))
+        executor.bind('resolve', VariantsBinding(resolved_pkgs))
+        executor.bind('building', self.building)
+
+        for pkg in resolved_pkgs:
+            commands = getattr(pkg, 'plugin_launch_commands')
+            if commands is None:
+                continue
+
+            bindings_ = bindings[pkg.name]
+            executor.bind('this',       bindings_["variant"])
+            executor.bind("version",    bindings_["version"])
+            executor.bind('root',       pkg.root)
+            executor.bind('base',       pkg.base)
+
+            # show a meaningful filename in traceback if an error occurs.
+            # Can't use an actual filepath because (a) the package may not
+            # have one and (b) it might be a yaml file (line numbers would
+            # not match up in this case).
+            filename = "<%s>" % pkg.uri
+
+            exc = None
+            trace = None
+            try:
+                executor.execute_code(commands.source, filename=filename)
+            except IndentationError as e:
+                commands_ = commands.corrected_for_indent()
+                if commands_ is commands:
+                    exc = e
+                    trace = traceback.format_exc()
+                else:
+                    try:
+                        executor.execute_code(commands_.source, filename=filename)
+                    except error_class as e:
+                        exc = e
+                        trace = traceback.format_exc()
+            except error_class as e:
+                exc = e
+                trace = traceback.format_exc()
+
+            if exc:
+                msg = "Error in %s in package %r:\n" % ('plugin_launch_commands', pkg.uri)
+                if self.verbosity >= 2:
+                    msg += trace
+                else:
+                    msg += str(exc)
+                raise PackageCommandError(msg)
+        # print executor.globals
+        #
+        # globals().update(executor.globals)
+
+    @_on_success
     def execute_shell(self, shell=None, parent_environ=None, rcfile=None,
                       norc=False, stdin=False, command=None, quiet=False,
                       block=None, actions_callback=None, context_filepath=None,
