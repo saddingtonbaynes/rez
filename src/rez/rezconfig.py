@@ -39,9 +39,9 @@ import os
 # The package search path. Rez uses this to find packages. A package with the
 # same name and version in an earlier path takes precedence.
 packages_path = [
+    "C:/env_manager/packages",
     "P:/packages",
-    "//sbps01/deploy/packages",
-    "C:/env_manager/packages"
+    "//sbps01/deploy/packages"
 ]
 
 # The path that Rez will locally install packages to when rez-build is used
@@ -206,7 +206,11 @@ package_filter = None
 # is ignored. Be aware that if you make variables such as PATH, PYTHONPATH or
 # app plugin paths parent variables, you are exposing yourself to potentially
 # incorrect behaviour within a resolved environment.
-parent_variables = []
+parent_variables = [
+    'windir', 'USERDNSDOMAIN', 'USERDOMAIN', 'USERPROFILE', 'SystemDrive', 'SystemRoot', 'TEMP', 'TMP',
+    'CommonProgramFiles', 'CommonProgramW6432', 'COMPUTERNAME', 'HOMEDRIVE', 'HOMEPATH', 'HOMESHARE', 'LOCALAPPDATA',
+    'LOGONSERVER', 'NUMBER_OF_PROCESSORS', 'OS', 'USERNAME'
+]
 all_parent_variables = False
 
 # When two or more packages in a resolve attempt to set the same environment
@@ -422,7 +426,7 @@ max_package_changelog_chars = 65536
 # written in json, which is a LOT faster. You would only set to true for
 # backwards compatibility reasons. Note that rez will detect either format on
 # rxt file load.
-rxt_as_yaml = True
+rxt_as_yaml = False
 
 
 ###############################################################################
