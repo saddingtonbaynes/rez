@@ -112,7 +112,7 @@ class CMD(Shell):
     def _bind_interactive_rez(self):
         if config.set_prompt and self.settings.prompt:
             stored_prompt = os.getenv("REZ_STORED_PROMPT")
-            curr_prompt = stored_prompt or os.getenv("PROMPT", "foobar")
+            curr_prompt = stored_prompt or os.getenv("PROMPT", "$P$G")
             if not stored_prompt:
                 self.setenv("REZ_STORED_PROMPT", curr_prompt)
 
