@@ -16,7 +16,7 @@ class CMD(Shell):
     # For reference, the ss64 web page provides useful documentation on builtin
     # commands for the Windows Command Prompt (cmd).  It can be found here :
     # http://ss64.com/nt/cmd.html
-    syspaths = None
+    syspaths = set([r'%SystemRoot%\system32', r'C:\Program Files\StandaloneBins'])
     _executable = None
 
     @property
