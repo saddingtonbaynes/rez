@@ -251,8 +251,10 @@ class UnixShell(Shell):
             return target_file
 
         def _create_ex():
+            parent_vars = True if config.all_parent_variables \
+                else config.parent_variables
             return RexExecutor(interpreter=self.new_shell(),
-                               parent_environ={},
+                               parent_variables=parent_vars,
                                add_default_namespaces=False)
 
         executor = _create_ex()
