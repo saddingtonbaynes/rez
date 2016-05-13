@@ -185,6 +185,19 @@ class ActionManager(object):
         self._env_sep_map = env_sep_map if env_sep_map is not None \
             else config.env_var_separators
 
+        if isinstance(self.parent_variables, set):
+            for key in self.parent_variables:
+                if key in self.parent_environ:
+                    value = self.parent_environ[key]
+                    unexpanded_key, expanded_key = self._key(key)
+                    unexpanded_value, expanded_value = self._value(value)
+                    self.environ[expanded_key] = expanded_value
+                    if self.interpreter.expand_env_vars:
+                        self.interpreter.setenv(expanded_key, expanded_value)
+                    else:
+                        self.interpreter.setenv(unexpanded_key, unexpanded_value)
+                    self.actions.append(Setenv(unexpanded_key, unexpanded_value))
+
     def get_action_methods(self):
         """
         return a list of methods on this class for executing actions.
@@ -220,8 +233,11 @@ class ActionManager(object):
         def _fn(str_):
             str_ = expandvars(str_, self.environ)
             str_ = expandvars(str_, self.parent_environ)
-            return os.path.expanduser(str_)
 
+            return os.path.expanduser(str_)
+        if isinstance(value, EscapedString):
+            if value.force_fwd_slash:
+                return str(value.formatted(_fn)).replace('\\', '/')
         return EscapedString.promote(value).formatted(_fn)
 
     def _key(self, key):
@@ -669,12 +685,16 @@ class EscapedString(object):
         you can use the `literal` and `expandable` free functions, rather than
         constructing a class instance directly.
     """
-    def __init__(self, value, is_literal=False):
+    force_fwd_slash = False
+
+    def __init__(self, value, is_literal=False, force_fwd_slash=False):
         self.strings = [(is_literal, value)]
+        self.force_fwd_slash = force_fwd_slash
 
     def copy(self):
         other = EscapedString.__new__(EscapedString)
         other.strings = self.strings[:]
+        other.force_fwd_slash = self.force_fwd_slash
         return other
 
     def literal(self, value):
@@ -748,6 +768,7 @@ class EscapedString(object):
         """
         other = EscapedString.__new__(EscapedString)
         other.strings = []
+        other.force_fwd_slash = self.force_fwd_slash
 
         for is_literal, value in self.strings:
             if not is_literal:
@@ -830,9 +851,9 @@ def literal(value):
     return EscapedString(value, True)
 
 
-def expandable(value):
+def expandable(value, force_fwd_slash=False):
     """Creates an expandable string."""
-    return EscapedString(value, False)
+    return EscapedString(value, False, force_fwd_slash=force_fwd_slash)
 
 
 #===============================================================================
