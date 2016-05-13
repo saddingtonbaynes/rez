@@ -146,7 +146,7 @@ def bind(path, version_range=None, opts=None, parser=None):
         else:
             raise RuntimeError('A package must have a version.')
 
-    # duck type the setup function so we can steal the arguments passed to it
+    # monkey patch the setup function so we can steal the arguments passed to it
     setuptools.setup = setup_dummy
     distutils.core.setup = setup_dummy
 
@@ -170,19 +170,21 @@ def bind(path, version_range=None, opts=None, parser=None):
         :param req_str: requirement in the setuptools format
         :return: requirement in the rez format
         '''
-        req_str = req_str.replace('-', '_')
 
         if not any((op in req_str for op in ['<', '>', '='])):
             # even simpler "arrow" req
-            return req_str.strip()
+            return req_str.replace('-', '_').strip()
         if '==' in req_str:
             # just a simple "arrow == 0.4.4" req
             req_pgk_name, req_version = req_str.split('==')
-            return '{}-{}'.format(req_pgk_name.strip(), req_version.strip())
+            return '{}-{}'.format(req_pgk_name.replace('-', '_').strip(), req_version.strip())
 
-        req_space_split = req_str.split(' ')
-        req_pgk_name = req_space_split[0]
-        req_pgk_req_str = ' '.join(req_space_split[1:])
+        complex_req_match = re.match(r'^(?P<pkg_name>[a-zA-Z0-9\.-_]+) *(?P<reqs>[\.,<>=0-9) ]+)$', req_str.strip())
+        if not complex_req_match:
+            raise RuntimeError('Unable to parse requirement; {}'.format(req_str))
+
+        req_pgk_name = complex_req_match.group('pkg_name')
+        req_pgk_req_str = complex_req_match.group('reqs')
         requirements = map(lambda s: s.strip(), req_pgk_req_str.split(','))
 
         versions_rewrite = []
@@ -196,7 +198,7 @@ def bind(path, version_range=None, opts=None, parser=None):
                 versions_rewrite.append('<{}'.format(req_version))
             else:
                 raise RuntimeError('Unable to translate operation: "{}" in requirement: {}'.format(operation, req_str))
-        return '{}-{}'.format(req_pgk_name, ''.join(versions_rewrite))
+        return '{}-{}'.format(req_pgk_name.replace('-', '_'), ''.join(versions_rewrite))
 
     def make_root(variant, root):
         binpath = make_dirs(root, "bin")
