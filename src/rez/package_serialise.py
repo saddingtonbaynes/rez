@@ -20,6 +20,7 @@ package_key_order = [
     'authors',
     'tools',
     'tools_info',
+    'excluded_tools',
     'has_plugins',
     'plugin_for',
     'requires',
@@ -63,6 +64,7 @@ package_serialise_schema = Schema({
     Optional("authors"):                [basestring],
     Optional("tools"):                  [basestring],
     Optional("tools_info"):             dict,
+    Optional("excluded_tools"):         [basestring],
 
     Optional('requires'):               [package_request_schema],
     Optional('build_requires'):         [package_request_schema],

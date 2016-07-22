@@ -1112,7 +1112,7 @@ class RexExecutor(object):
     def compile_code(cls, code, filename=None, exec_namespace=None):
         """Compile and possibly execute rex code.
 
-        Args:
+        Args:set PATH
             code (str): The python code to compile.
             filename (str): File to associate with the code, will default to
                 '<string>'.

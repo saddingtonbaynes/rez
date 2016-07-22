@@ -132,7 +132,9 @@ if __name__ == "__main__":
     py_executable = which("python", env={"PATH":venv_bin_dir,
                                          "PATHEXT":os.environ.get("PATHEXT",
                                                                   "")})
-    args = [py_executable, "setup.py", "install"]
+    args = [
+        py_executable, "setup.py", "install", "--quiet",
+        "--single-version-externally-managed", "--record", os.path.join(dest_dir, 'install_log.txt')]
     if opts.verbose:
         print "running in %s: %s" % (source_path, " ".join(args))
     p = subprocess.Popen(args, cwd=source_path)

@@ -91,7 +91,8 @@ setup(
             ['rezconfig', 'utils/logging.conf'] +
             ['README*'] +
             find_files('*.*', 'completion') +
-            find_files('*.*', 'tests/data'),
+            find_files('*.*', 'tests/data') +
+            find_files('*.*', 'bind/resources'),
         'rezplugins':
             find_files('rezconfig', root='rezplugins') +
             find_files('*.cmake', 'build_system', root='rezplugins') +

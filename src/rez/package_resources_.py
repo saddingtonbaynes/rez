@@ -71,6 +71,7 @@ package_base_schema_dict.update({
     Optional('config'):                 Config,
     Optional('tools'):                  [basestring],
     Optional('tools_info'):             dict,
+    Optional("excluded_tools"):         [basestring],
     Optional('help'):                   help_schema,
 
     # commands
@@ -155,6 +156,7 @@ package_pod_schema_dict.update({
                                             Use(lambda x: create_config(overrides=x))),
     Optional('tools'):                  [basestring],
     Optional('tools_info'):             dict,
+    Optional("excluded_tools"):         [basestring],
     Optional('help'):                   help_schema,
 
     Optional('pre_commands'):           _commands_schema,

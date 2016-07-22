@@ -1123,6 +1123,8 @@ class ResolvedContext(object):
             if commands is None:
                 continue
 
+            print 'running launch cmds for {}'.format(pkg.uri)
+
             bindings_ = bindings[pkg.name]
             executor.bind('this',       bindings_["variant"])
             executor.bind("version",    bindings_["version"])
@@ -1170,6 +1172,7 @@ class ResolvedContext(object):
                       norc=False, stdin=False, command=None, quiet=False,
                       block=None, actions_callback=None, context_filepath=None,
                       start_new_session=False, detached=False, pre_command=None,
+                      popen_shell=False,
                       **Popen_args):
         """Spawn a possibly-interactive shell.
 
@@ -1217,6 +1220,8 @@ class ResolvedContext(object):
         # start a new session if specified
         if start_new_session:
             Popen_args.update(config.new_session_popen_args)
+
+        Popen_args['shell'] = popen_shell
 
         # open a separate terminal if specified
         if detached:
@@ -1356,6 +1361,7 @@ class ResolvedContext(object):
         # create and init the context
         r = ResolvedContext.__new__(ResolvedContext)
         r.load_path = None
+        r.verbosity = 0
 
         r.timestamp = d["timestamp"]
         r.building = d["building"]
