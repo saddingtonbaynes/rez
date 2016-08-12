@@ -41,6 +41,7 @@ import os
 packages_path = [
     "C:/env_manager/packages",
     "P:/packages",
+    "//sbpstor/deploy/packages",
     "//sbps01/deploy/packages"
 ]
 
