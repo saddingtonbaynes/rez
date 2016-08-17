@@ -49,7 +49,7 @@ local_packages_path = "C:/env_manager/packages"
 
 # The path that Rez will deploy packages to when rez-release is used. For
 # production use, you will probably want to change this to a site-wide location.
-release_packages_path = "P:/packages"
+release_packages_path = '//sbpstor/deploy/packages'  # "P:/packages"
 
 # Where temporary files go. Defaults to appropriate path depending on your
 # system - for example, *nix distributions will probably set this to "/tmp". It
