@@ -41,8 +41,7 @@ import os
 packages_path = [
     "C:/env_manager/packages",
     "P:/packages",
-    "//sbpstor/deploy/packages",
-    "//sbps01/deploy/packages"
+    "//sbpstor/deploy/packages"  # "//sbps01/deploy/packages"
 ]
 
 # The path that Rez will locally install packages to when rez-build is used
