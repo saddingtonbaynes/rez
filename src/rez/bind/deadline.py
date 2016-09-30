@@ -16,7 +16,7 @@ from rez.utils.platform_ import platform_
 from rez.vendor.version.version import Version
 
 PULSE_SERVERS = {
-    "6": 'sbas04',
+    # "6": 'sbas04',
     "7": 'sbdeadline'
 }
 
@@ -49,7 +49,7 @@ def bind(path, version_range=None, opts=None, parser=None):
     else:
         installed_versions = []
         thinkbox_root = r'C:\Program Files\Thinkbox'
-        app_folder_prefix = 'Deadline'
+        app_folder_prefix = 'Deadline7'  # previous value was 'Dealine' with no number
         for app_folder in os.listdir(thinkbox_root):
             if app_folder.startswith(app_folder_prefix):
                 app_exe = os.path.join(thinkbox_root, app_folder, 'bin', 'deadlinecommand.exe')
