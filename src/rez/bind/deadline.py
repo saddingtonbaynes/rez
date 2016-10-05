@@ -36,45 +36,45 @@ def bind(path, version_range=None, opts=None, parser=None):
     if platform_.name != 'windows':
         raise EnvironmentError('Only binds on windows at the moment')
 
-    # find executable, determine version
-    if opts and opts.root:
-        root_path = opts.root
-        try:
-            info = GetFileVersionInfo(os.path.join(root_path, 'bin', 'deadlinecommand.exe'), "\\")
-            ms = info['FileVersionMS']
-            ls = info['FileVersionLS']
-            version = Version('{}.{}.{}.{}'.format(HIWORD(ms), LOWORD(ms), HIWORD(ls), LOWORD(ls)))
-        except:
-            raise EnvironmentError('Unknown version')
-    else:
-        installed_versions = []
-        thinkbox_root = r'C:\Program Files\Thinkbox'
-        app_folder_prefix = 'Deadline7'  # previous value was 'Dealine' with no number
-        for app_folder in os.listdir(thinkbox_root):
-            if app_folder.startswith(app_folder_prefix):
-                app_exe = os.path.join(thinkbox_root, app_folder, 'bin', 'deadlinecommand.exe')
-                if os.path.exists(app_exe):
-                    try:
-                        info = GetFileVersionInfo(app_exe, "\\")
-                        ms = info['FileVersionMS']
-                        ls = info['FileVersionLS']
-                        version = Version('{}.{}.{}.{}'.format(HIWORD(ms), LOWORD(ms), HIWORD(ls), LOWORD(ls)))
-                    except:
-                        raise EnvironmentError('Unknown version')
-                    installed_versions.append(
-                        (app_folder, version)
-                    )
-
-        if len(installed_versions) < 1:
-            raise EnvironmentError(
-                'Unable to find any installed version of Deadline under "{}"'.format(
-                    thinkbox_root
+    # # find executable, determine version
+    # if opts and opts.root:
+    #     root_path = opts.root
+    #     try:
+    #         info = GetFileVersionInfo(os.path.join(root_path, 'bin', 'deadlinecommand.exe'), "\\")
+    #         ms = info['FileVersionMS']
+    #         ls = info['FileVersionLS']
+    #         version = Version('{}.{}.{}.{}'.format(HIWORD(ms), LOWORD(ms), HIWORD(ls), LOWORD(ls)))
+    #     except:
+    #         raise EnvironmentError('Unknown version')
+    # else:
+    installed_versions = []
+    thinkbox_root = r'C:\Program Files\Thinkbox'
+    app_folder_prefix = 'Deadline7'  # previous value was 'Deadline' with no number
+    for app_folder in os.listdir(thinkbox_root):
+        if app_folder.startswith(app_folder_prefix):
+            app_exe = os.path.join(thinkbox_root, app_folder, 'bin', 'deadlinecommand.exe')
+            if os.path.exists(app_exe):
+                try:
+                    info = GetFileVersionInfo(app_exe, "\\")
+                    ms = info['FileVersionMS']
+                    ls = info['FileVersionLS']
+                    version = Version('{}.{}.{}.{}'.format(HIWORD(ms), LOWORD(ms), HIWORD(ls), LOWORD(ls)))
+                except:
+                    raise EnvironmentError('Unknown version')
+                installed_versions.append(
+                    (app_folder, version)
                 )
+
+    if len(installed_versions) < 1:
+        raise EnvironmentError(
+            'Unable to find any installed version of Deadline under "{}"'.format(
+                thinkbox_root
             )
+        )
 
-        app_folder, version = sorted(installed_versions, key=lambda v: v[1])[-1]
+    app_folder, version = sorted(installed_versions, key=lambda v: v[1])[-1]
 
-        root_path = os.path.join(thinkbox_root, app_folder, 'bin')
+    root_path = os.path.join(thinkbox_root, app_folder, 'bin')
 
     check_version(version, version_range)
 
